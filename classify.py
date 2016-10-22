@@ -11,6 +11,7 @@ from sklearn.cross_validation import cross_val_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
+from sklearn.externals import joblib
 
 
 features_array_train = []
@@ -41,18 +42,15 @@ def trainAndPredict(X_train, y_train_text, X_test, target_labels, testing_data):
     y_train = lb.fit_transform(y_train_text)
     print "DONE"
 
-    clf = OneVsRestClassifier(svm.SVC(verbose=2, kernel='linear', probability=True))
-    print "FITTING DATA"
-    clf.fit(X_train, y_train)
-    print "DONE"
-    predicted = clf.predict(X_test)
-
-    labels_predicted = lb.inverse_transform(predicted)
+    print "LOADING MODEL"
+    model_clone = joblib.load('my_model.pkl')
+    print "PREDICTING ON TEST DATA"
+    pred = model_clone.predict(X_test)
+    labels_predicted = lb.inverse_transform(pred)
 
     print 'Precision: ', precision_score(labels_true, labels_predicted, average='weighted')
     print 'Recall: ', recall_score(labels_true, labels_predicted, average='weighted')
     print 'F-Score ', f1_score(labels_true, labels_predicted, average='weighted')
-
 
 if __name__ == '__main__':
     training_data = open('training_data.txt', 'r')
